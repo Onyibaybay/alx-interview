@@ -13,5 +13,6 @@ def pascal_triangle(n):
         # End each row with 1
         row.append(1)
         triangle.append(row)
+	print(pascal_triangle(5))
 
     return triangle

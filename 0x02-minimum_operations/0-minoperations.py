@@ -2,7 +2,7 @@
 """Minimum Operations module."""
 
 
-def minoperations(n):
+def minOperations(n):
     """
     Calculate the minimum number of operations to get exactly
     n 'H' characters using 'Copy All' and 'Paste' operations.

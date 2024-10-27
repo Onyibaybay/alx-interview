@@ -40,4 +40,8 @@ try:
 
 except KeyboardInterrupt:
     print_metrics(status_codes, total_size)
+<<<<<<< HEAD
     raise
+=======
+    raise
+>>>>>>> 96e0bf3a3cbd373b2a9be9771890ab519b6a37fa

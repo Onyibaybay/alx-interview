@@ -1,17 +1,19 @@
 #!/usr/bin/python3
-"""Minimum Operations module."""
+""" Minimum Opoerations """
 
 
 def minOperations(n):
     """
-    Calculate the minimum number of operations to get exactly
-    n 'H' characters using 'Copy All' and 'Paste' operations.
+    Calculates the minimum number of operations needed to get
+    exactly n 'H' characters in the file using only 'Copy All'
+    and 'Paste' operations.
 
     Parameters:
-    n (int): Target number of 'H' characters.
+    n (int): The target number of 'H' characters.
 
     Returns:
-    int: Minimum operations required, or 0 if impossible.
+    int: The minimum number of operations required.
+    If n is impossible to achieve, return 0.
     """
     if n <= 1:
         return 0
@@ -22,8 +24,7 @@ def minOperations(n):
     while factor <= n:
         while n % factor == 0:
             operations += factor
-            n //= factor
+            n = n // factor
         factor += 1
 
     return operations
-

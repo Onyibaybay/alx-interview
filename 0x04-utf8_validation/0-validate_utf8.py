@@ -1,49 +1,50 @@
 #!/usr/bin/python3
-"""UTF8 Validation."""
+"""
+This module provides a function to validate UTF-8 encoding.
+"""
 
 
 def validUTF8(data):
     """
-    Method that determines if a given data set represents a valid
-    UTF-8 encoding.
-    Return: True if data is a valid UTF-8 encoding, else return False
+    Determines if a given data set represents a valid UTF-8 encoding.
+
+    Args:
+        data (list): List of integers where each integer represents a byte
+                     (8 bits).
+
+    Returns:
+        bool: True if the data is a valid UTF-8 encoding, else False.
     """
+    num_bytes = 0  # Number of bytes left in the current UTF-8 character
 
-    # Variable for tracking the number of bytes in UTF-8 Character
-    byte_count = 0
-
-    # Masks for checking if byte is a continuation byte (Starts with 10)
-    mask_high = 1 << 7
-    mask_low = 1 << 6
+    MASK1 = 1 << 7  # 10000000 in binary
+    MASK2 = 1 << 6  # 01000000 in binary
 
     for byte in data:
+        byte = byte & 0xFF  # Only keep the 8 least significant bits
 
-        current_mask = 1 << 7
-
-        if byte_count == 0:
+        if num_bytes == 0:
             # Determine the number of bytes in the UTF-8 character
-            while current_mask & byte:
-                byte_count += 1
-                current_mask >>= 1
+            if byte & MASK1 == 0:
+                continue  # 1-byte character (0xxxxxxx)
+            elif byte & (MASK1 | MASK2) == MASK1:
+                return False  # Invalid continuation byte found
+            else:
+                # Count the leading 1s to determine byte length
+                mask = MASK1
+                while byte & mask:
+                    num_bytes += 1
+                    mask >>= 1
 
-            # If byte count did not increase, it means it's a 1-byte character
-            # No need to check the next bytes for this character
-            if byte_count == 0:
-                continue
+                if num_bytes == 1 or num_bytes > 4:
+                    return False  # Invalid UTF-8 length
 
-            # UTF-8 characters can be 1 to 4 bytes long
-            # 1-byte characters start with 0, so byte_count should never be 1
-            if byte_count == 1 or byte_count > 4:
-                return False
-
+                num_bytes -= 1  # Account for the current byte
         else:
-            # Every byte that is not the first byte of a character should start
-            # with 10, otherwise it is not valid
-            if not (byte & mask_high and not (byte & mask_low)):
+            # Check if it's a valid continuation byte (10xxxxxx)
+            if byte & (MASK1 | MASK2) != MASK2:
                 return False
+            num_bytes -= 1
 
-        # If the bytes for the character are valid, decrease the count
-        byte_count -= 1
+    return num_bytes == 0  # Ensure all bytes are used up
 
-    # All characters were verified correctly with their proper byte count
-    return byte_count == 0

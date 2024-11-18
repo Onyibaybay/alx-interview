@@ -2,54 +2,45 @@
 
 const request = require('request');
 
-// Get the movie ID from command line arguments
 const movieId = process.argv[2];
+console.log('Movie ID:', movieId); // Debugging line
 
-// Check if movieId is provided
 if (!movieId) {
-  console.error('Movie ID is required');
+  console.log('Please provide a Movie ID.');
   process.exit(1);
 }
 
-// Star Wars API URL for films
-const filmsUrl = `https://swapi.dev/api/films/${movieId}/`;
+const filmUrl = `https://swapi.dev/api/films/${movieId}/`;
 
-// Fetch movie data
-request(filmsUrl, (error, response, body) => {
+request(filmUrl, (error, response, body) => {
   if (error) {
-    console.error('Error fetching movie data:', error);
-    process.exit(1);
+    console.error('Error fetching film data:', error);
+    return;
   }
 
-  // Parse the JSON response
-  const movieData = JSON.parse(body);
+  const filmData = JSON.parse(body);
 
-  // Check if movie data contains characters
-  if (!movieData.characters) {
-    console.error('No characters found in the movie data');
-    process.exit(1);
+  console.log('Film Data:', filmData); // Debugging line
+
+  if (filmData.detail && filmData.detail === 'Not found') {
+    console.log('Movie not found!');
+    return;
   }
 
-  // Function to fetch character data and print the name
-  const fetchCharacter = (url, callback) => {
+  console.log(`Characters from: ${filmData.title}`);
+
+  const charactersUrls = filmData.characters;
+
+  charactersUrls.forEach((url) => {
     request(url, (error, response, body) => {
       if (error) {
-        console.error('Error fetching character data:', error);
-        process.exit(1);
+        console.error('Error fetching character:', error);
+        return;
       }
+
       const characterData = JSON.parse(body);
       console.log(characterData.name);
-      callback();
     });
-  };
-
-  // Fetch and print each character
-  const fetchAllCharacters = (urls) => {
-    if (urls.length === 0) return;
-
-    const url = urls.shift();
-    fetchCharacter(url, () => fetchAllCharacters(urls));
-  };
-
-  fetchAllCharacters(movieData.characters);
+  });
 });
+

@@ -1,30 +1,40 @@
 #!/usr/bin/python3
+"""
+Lockboxes Problem
+
+This script contains a method to determine if all the boxes in a
+given list of lists can be unlocked.
+Each box is numbered sequentially from 0 to n - 1 and may contain
+keys to other boxes. The goal is to check if all boxes can be opened
+starting from the first box, which is initially unlocked.
+
+"""
+
+
 def canUnlockAll(boxes):
-    """Determine if all boxes can be unlocked."""
+    """
+    Determines if all boxes can be opened.
+
+    Parameters:
+    boxes (list of lists): List where each element is a list of
+    keys contained in that box.
+
+    Returns:
+    bool: True if all boxes can be opened, False otherwise.
+    """
     if not boxes:
         return False
 
     n = len(boxes)
-    unlocked = [False] * n  # Track unlocked boxes
-    unlocked[0] = True  # First box is unlocked
-    keys = set(boxes[0])  # Get keys from the first box
-    keys.add(0)  # Add the first box as unlocked
+    unlocked = [False] * n
+    unlocked[0] = True
+    stack = [0]
 
-    while keys:
-        current_key = keys.pop()  # Get a key
-        if current_key < n and not unlocked[current_key]:
-            unlocked[current_key] = True  # Unlock the box
-            # Add new keys found in the unlocked box
-            keys.update(boxes[current_key])
+    while stack:
+        current_box = stack.pop()
+        for key in boxes[current_box]:
+            if key < n and not unlocked[key]:
+                unlocked[key] = True
+                stack.append(key)
 
-    return all(unlocked)  # Check if all boxes are unlocked
-
-
-# Example Usage:
-if __name__ == "__main__":
-    boxes = [[1], [2], [3], [4], []]  # Each box contains keys to next box
-    print(canUnlockAll(boxes))  # Output: True
-
-    boxes = [[1, 2], [3], [], [2]]  # Some boxes are unreachable
-    print(canUnlockAll(boxes))  # Output: False
-
+    return all(unlocked)
